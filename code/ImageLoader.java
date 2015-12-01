@@ -1,4 +1,4 @@
-package swing;
+package code;
 
 import java.awt.Component;
 import java.awt.Dimension;

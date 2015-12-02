@@ -9,7 +9,7 @@ public class TcpServer extends Thread {
 
 	public TcpServer(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
-		serverSocket.setSoTimeout(10000);
+		serverSocket.setSoTimeout(10000000);
 	}
 
 	public void run() {

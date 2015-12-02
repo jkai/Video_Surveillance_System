@@ -13,11 +13,11 @@ import javax.swing.JPanel;
 public class Monitor extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private boolean flag = true;
 
 	private JPanel monitorPanel = new JPanel();
-	JButton btnStart = new JButton("Start");
-	JButton btnNext = new JButton("Next");
+	private JButton btnStartServer = new JButton("Start Server");
+	private JButton btnStartTimer = new JButton("Start Timer");
+	private boolean flag = false;
 
 	public Monitor() {
 		super("Video Surveillance System");
@@ -27,8 +27,8 @@ public class Monitor extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Monitor.class.getResource("/resource/Icon.png")));
 		setLayout(new FlowLayout());
 		add(monitorPanel);
-		add(btnStart);
-		add(btnNext);
+		add(btnStartServer);
+		add(btnStartTimer);
 		setVisible(true);
 	}
 
@@ -37,21 +37,21 @@ public class Monitor extends JFrame {
 		monitorPanel.setBackground(Color.WHITE);
 		monitorPanel.add(new ImageLoader("M:\\Lab5\\Monitor\\src\\resource\\Ready.jpg"));
 		// Start button
-		btnStart.addActionListener(new ActionListener() {
+		btnStartServer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				startMonitor();
+				startServer();
 			}
 		});
 		// Next button
-		btnNext.addActionListener(new ActionListener() {
+		btnStartTimer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				nextPic();
+				startTimer();
 			}
 		});
 		this.revalidate();
 	}
 
-	private void nextPic() {
+	public void togglePic() {
 		if (flag) {
 			monitorPanel.remove(0);
 			monitorPanel.add(new ImageLoader("M:\\Lab5\\Monitor\\src\\resource\\pic1.jpg"));
@@ -63,13 +63,25 @@ public class Monitor extends JFrame {
 			this.revalidate();
 			flag = !flag;
 		}
-
 	}
 
-	private void startMonitor() {
-		monitorPanel.remove(0);
-		monitorPanel.add(new ImageLoader("M:\\Lab5\\Monitor\\src\\resource\\pic2.jpg"));
-		this.revalidate();
+	// private void fetchPic() {
+	// if (!Start.getImgList().isEmpty()) {
+	// monitorPanel.remove(0);
+	// monitorPanel.add(new ImageLoader(Start.getImgList().getFirst()));
+	// Start.getImgList().removeFirst();
+	// this.revalidate();
+	// } else {
+	// System.out.print("No images in the buffer!\n");
+	// }
+	// }
+
+	private void startServer() {
+		Start.getServer().start();
+	}
+
+	private void startTimer() {
+		Start.getTimer().start();
 	}
 
 }

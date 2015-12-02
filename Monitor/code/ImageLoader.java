@@ -22,12 +22,16 @@ public class ImageLoader extends Component {
 		}
 	}
 
+	public ImageLoader(BufferedImage img) {
+		this.img = img;
+	}
+
 	public void paint(Graphics g) {
 		g.drawImage(img, 0, 0, null);
 	}
 
 	public Dimension getPreferredSize() {
-			return new Dimension(640, 480);
+		return new Dimension(640, 480);
 	}
 
 }

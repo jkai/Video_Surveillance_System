@@ -65,16 +65,16 @@ public class Monitor extends JFrame {
 		}
 	}
 
-	// private void fetchPic() {
-	// if (!Start.getImgList().isEmpty()) {
-	// monitorPanel.remove(0);
-	// monitorPanel.add(new ImageLoader(Start.getImgList().getFirst()));
-	// Start.getImgList().removeFirst();
-	// this.revalidate();
-	// } else {
-	// System.out.print("No images in the buffer!\n");
-	// }
-	// }
+	public void fetchPic() {
+		if (!Start.getImgList().isEmpty()) {
+			monitorPanel.remove(0);
+			monitorPanel.add(new ImageLoader(Start.getImgList().getFirst()));
+			Start.getImgList().removeFirst();
+			this.revalidate();
+		} else {
+			System.out.print("No images in the buffer!\n");
+		}
+	}
 
 	private void startServer() {
 		Start.getServer().start();

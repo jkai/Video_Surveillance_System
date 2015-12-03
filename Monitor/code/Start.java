@@ -1,11 +1,8 @@
 package code;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
-
-import javax.imageio.ImageIO;
 
 public class Start {
 
@@ -14,20 +11,7 @@ public class Start {
 	public static TcpServer server;
 	public static MonitorTimer timer;
 
-	private static BufferedImage temp;
-
 	public static void main(String[] args) {
-
-		// Temp add img to list for test
-		try {
-			temp = ImageIO.read(new File("M:\\Lab5\\Monitor\\src\\resource\\pic1.jpg"));
-			ImgList.add(temp);
-			temp = ImageIO.read(new File("M:\\Lab5\\Monitor\\src\\resource\\pic2.jpg"));
-			ImgList.add(temp);
-
-		} catch (IOException e) {
-			System.out.print("Image reading error!\n");
-		}
 
 		// TCP server initial
 		try {

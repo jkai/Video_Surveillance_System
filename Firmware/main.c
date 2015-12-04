@@ -17,8 +17,89 @@
 //
 //*****************************************************************************
 
+// Standard includes
+#include <stdlib.h>
+
+// Hardware includes
+#include "hw_types.h"
+#include "hw_ints.h"
+#include "hw_memmap.h"
+
+// Driverlib includes
+#include "interrupt.h"
+#include "prcm.h"
+#include "rom.h"
+#include "rom_map.h"
+
+// SimpleLink includes
+#include "simplelink.h"
+
+// TFTP includes
+#include "datatypes.h"
+#include "tftp.h"
+
+//Common includes
+#include "network_if.h"
+#include "uart_if.h"
+#include "udma_if.h"
+#include "common.h"
+
+// Application includes
+#include "pinmux.h"
+
+
+// Vector table
+extern void (* const g_pfnVectors[])(void);
+
+static void BoardInit(void);
+static void TFTPTransfer(void);
+
 void main() 
 {
+    long lRetVal = -1;
+
+    // Board Initialization
+	BoardInit();
+
+    // Enable and configure DMA
+    UDMAInit();
+
+    // Pinmux for UART
+    PinMuxConfig();
+
+    // Configuring UART
+    InitTerm();
+
+    // Start the SimpleLink Host
+    lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    // Start TFTP transfer
+    TFTPTransfer()
+
+    // Hang at end of execution
+    LOOP_FOREVER();
+}
+
+static void BoardInit(void)
+{
+	// Set base of vector table
+    IntVTableBaseSet((unsigned long)&g_pfnVectors[0]);
+
+    // Enable Processor
+    MAP_IntMasterEnable();
+    MAP_IntEnable(FAULT_SYSTICK);
+
+    PRCMCC3200MCUInit();
+}
+
+static void TFTPTransfer(void)
+{
+	// TODO (Brandon): Test TFTP Transfer to and from a TFTP server
 }
 
 //*****************************************************************************

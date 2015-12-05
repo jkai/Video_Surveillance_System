@@ -29,12 +29,17 @@
 #include "hw_types.h"
 #include "hw_ints.h"
 #include "hw_memmap.h"
+#include "hw_common_reg.h"
+#include "hw_uart.h"
 
 // Driverlib includes
 #include "interrupt.h"
 #include "prcm.h"
 #include "rom.h"
 #include "rom_map.h"
+#include "uart.h"
+#include "udma.h"
+#include "utils.h"
 
 // SimpleLink includes
 #include "simplelink.h"
@@ -77,6 +82,7 @@ extern void (* const g_pfnVectors[])(void);
 
 static void BoardInit(void);
 static void TFTPTransfer(void);
+static void UARTIntHandler();	// UART interrupt handler
 
 
 //*****************************************************************************
@@ -99,6 +105,21 @@ void main()
     // Configuring UART
     InitTerm();
 
+    // Register interrupt handler for UARTA0
+    MAP_UARTIntRegister(UARTA0_BASE, UARTIntHandler);
+
+    // Enable DMA done interrupts for UARTA0
+    //MAP_UARTIntEnable(UARTA0_BASE, UART_INT_DMARX);
+
+    // Configure UART to work with the Terminal
+    MAP_UARTConfigSetExpClk(CONSOLE, MAP_PRCMPeripheralClockGet(CONSOLE_PERIPH),
+                            UART_BAUD_RATE,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                            UART_CONFIG_PAR_NONE));
+
+    // Clear terminal
+    ClearTerm();
+
     // Start the SimpleLink Host
     lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
     if(lRetVal < 0)
@@ -106,6 +127,12 @@ void main()
         ERR_PRINT(lRetVal);
         LOOP_FOREVER();
     }
+
+    // Display banner
+    Report("\t\t *********************************************\n\r");
+    Report("\t\t    Starting Video Streaming Application       \n\r");
+    Report("\t\t *********************************************\n\r");
+
 
     // Start TFTP transfer
     TFTPTransfer();
@@ -282,6 +309,13 @@ static void TFTPTransfer(void)
     //************************************************************
     //  TFTP Write End
     //************************************************************
+}
+
+// Interrupt handler for UART
+static void UARTIntHandler()
+{
+	// TODO (Brandon): Handle UART interrupts
+	return;
 }
 
 //*****************************************************************************

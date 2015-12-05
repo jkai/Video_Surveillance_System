@@ -56,8 +56,9 @@
 //*****************************************************************************
 // DEFINES
 //*****************************************************************************
-#define TFTP_IP			0xC0A8006D	/* This is the host IP */
-#define FILE_SIZE_MAX	(20*1024)	/* Max File Size set to 20KB */
+
+#define TFTP_IP			0xC0A806D3	// This is the host IP: 192.168.6.211
+#define FILE_SIZE_MAX	(20*1024)	// Max File Size set to 20KB
 #define SSID 			"NETGEAR31"
 #define SSID_KEY		"happystar329"
 
@@ -65,6 +66,7 @@
 //*****************************************************************************
 // VARIABLES
 //*****************************************************************************
+
 // Vector table defined exterenally (in startup_css.c)
 extern void (* const g_pfnVectors[])(void);
 
@@ -72,6 +74,7 @@ extern void (* const g_pfnVectors[])(void);
 //*****************************************************************************
 // FUNCTION PROTOTYPES
 //*****************************************************************************
+
 static void BoardInit(void);
 static void TFTPTransfer(void);
 
@@ -79,6 +82,7 @@ static void TFTPTransfer(void);
 //*****************************************************************************
 // MAIN
 //*****************************************************************************
+
 void main() 
 {
     long lRetVal = -1;
@@ -114,6 +118,7 @@ void main()
 //*****************************************************************************
 // FUNCTION IMPLEMENTATIONS
 //*****************************************************************************
+
 static void BoardInit(void)
 {
     // Set base of vector table
@@ -132,8 +137,8 @@ static void TFTPTransfer(void)
     unsigned char *pucFileBuffer = NULL;  // Data read or to be written
     unsigned long uiFileSize;
 
-    char *FileRead = "readFromServer.txt";	// File to be read using TFTP.
-    char *FileWrite = "writeToServer.txt";	// File to be written using TFTP.
+    char *FileRead = "readFromServer.txt";	// File to be read using TFTP
+    char *FileWrite = "writeToServer.txt";	// File to be written using TFTP
 
     long pFileHandle;			// Pointer to file handle
     SlFsFileInfo_t pFsFileInfo;
@@ -156,6 +161,10 @@ static void TFTPTransfer(void)
     UART_PRINT("Connecting to TFTP server %d.%d.%d.%d\n\r",\
                   SL_IPV4_BYTE(TFTP_IP, 3), SL_IPV4_BYTE(TFTP_IP, 2),
                   SL_IPV4_BYTE(TFTP_IP, 1), SL_IPV4_BYTE(TFTP_IP, 0));
+
+    //************************************************************
+    //  TFTP Read Start
+    //************************************************************
 
     // Set limit on file size
     uiFileSize = FILE_SIZE_MAX;
@@ -215,6 +224,64 @@ static void TFTPTransfer(void)
 
     // Close file (successfully written to FS)
     lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
+
+    //************************************************************
+    //  TFTP Read End
+    //************************************************************
+
+
+    //************************************************************
+    //  TFTP Write Start
+    //************************************************************
+
+    // Open same file which has been written with the server's file content
+    lRetVal = sl_FsOpen((unsigned char *)FileRead, FS_MODE_OPEN_READ, \
+                            NULL,&pFileHandle);
+    if(lRetVal < 0)
+    {
+        free(pucFileBuffer);
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    // Populate pFsFileInfo with file information FileRead
+    lRetVal = sl_FsGetInfo((unsigned char *)FileRead, NULL, &pFsFileInfo);
+    if(lRetVal < 0)
+    {
+        lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
+        free(pucFileBuffer);
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    // Number of bytes to send is equal to the size of the file received
+    uiFileSize = (&pFsFileInfo)->FileLen;
+
+    lRetVal = sl_FsRead(pFileHandle, 0, pucFileBuffer, uiFileSize);
+    if(lRetVal < 0)
+    {
+        lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
+        free(pucFileBuffer);
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
+    /* write to server with different file name */
+    lRetVal = sl_TftpSend(TFTP_IP, FileWrite, (char *)pucFileBuffer,\
+                        &uiFileSize, &uiTftpErrCode);
+    if(lRetVal < 0)
+    {
+        free(pucFileBuffer);
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    UART_PRINT("TFTP Write Successful \r\n");
+
+    //************************************************************
+    //  TFTP Write End
+    //************************************************************
 }
 
 //*****************************************************************************

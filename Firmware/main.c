@@ -24,6 +24,7 @@
 
 // Standard includes
 #include <stdlib.h>
+#include <string.h>
 
 // Hardware includes
 #include "hw_types.h"
@@ -44,15 +45,18 @@
 // SimpleLink includes
 #include "simplelink.h"
 
-// TFTP includes
-#include "datatypes.h"
-#include "tftp.h"
+// OS includes
+#include "osi.h"
 
 // Common includes
 #include "network_if.h"
 #include "uart_if.h"
 #include "udma_if.h"
 #include "common.h"
+
+// TFTP includes
+#include "datatypes.h"
+#include "tftp.h"
 
 // Application includes
 #include "pinmux.h"
@@ -62,10 +66,11 @@
 // DEFINES
 //*****************************************************************************
 
-#define TFTP_IP			0xC0A806D3	// This is the host IP: 192.168.6.211
+#define TFTP_IP			0xC0A8010E	// This is the host IP: 192.168.1.14
 #define FILE_SIZE_MAX	(20*1024)	// Max File Size set to 20KB
 #define SSID 			"NETGEAR31"
 #define SSID_KEY		"happystar329"
+#define OSI_STACK_SIZE	2048
 
 
 //*****************************************************************************
@@ -133,12 +138,21 @@ void main()
     Report("\t\t    Starting Video Streaming Application       \n\r");
     Report("\t\t *********************************************\n\r");
 
-
     // Start TFTP transfer
-    TFTPTransfer();
+    lRetVal = osi_TaskCreate(TFTPTransfer,
+                    (const signed char *)"TFTP",
+                    OSI_STACK_SIZE,
+                    NULL,
+                    1,
+                    NULL );
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
 
-    // Hang at end of execution
-    LOOP_FOREVER();
+    // Start the task scheduler
+    osi_start();
 }
 
 
@@ -173,12 +187,14 @@ static void TFTPTransfer(void)
     unsigned short uiTftpErrCode;
 
     // Configuring security parameters for the AP
-    secParams.Key = NULL;
-    secParams.KeyLen = 0;
-    secParams.Type = SL_SEC_TYPE_OPEN;
+    secParams.Key = SSID_KEY;
+    secParams.KeyLen = strlen(SSID_KEY);
+    secParams.Type = SL_SEC_TYPE_WPA_WPA2;
 
     // Initialize network driver
     lRetVal = Network_IF_InitDriver(ROLE_STA);
+
+    UART_PRINT("HERE!\n\r");
 
     // Connecting to WLAN AP - Set with static parameters defined at the top
     // After this call we will be connected and have IP address
@@ -314,8 +330,8 @@ static void TFTPTransfer(void)
 // Interrupt handler for UART
 static void UARTIntHandler()
 {
-	// TODO (Brandon): Handle UART interrupts
-	return;
+    // TODO (Brandon): Handle UART interrupts
+    return;
 }
 
 //*****************************************************************************

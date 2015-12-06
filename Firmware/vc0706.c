@@ -14,9 +14,29 @@
 
 #include "vc0706.h"
 
-void VC0706SetSerialNum(unsigned short usSerialNum)
+char VC0706SystemReset()
 {
-    // TODO (Brandon): Implement
+    unsigned char ucArgs[] = {0x0};
+
+    return _VC0706RunCommand(VC0706_COMMAND_SYSTEM_RESET, ucArgs, 1, 5);
+}
+
+char VC0706SetSerialNum(unsigned char ucSerialNum)
+{
+    unsigned char ucArgs[] = {0x01, ucSerialNum};
+
+    return _VC0706RunCommand(VC0706_COMMAND_SET_SERIAL_NUM, ucArgs,
+                             sizeof(ucArgs), 5);
+}
+
+char VC0706SetBaudRate(unsigned short usBaudRate)
+{
+    unsigned char ucArgs[] = {0x03, VC0706_INTERFACE_UART,
+                              (unsigned char)usBaudRate,
+                              (unsigned char)(usBaudRate >> 2)};
+
+    return _VC0706RunCommand(VC0706_COMMAND_SET_PORT, ucArgs,
+                             sizeof(ucArgs), 5);
 }
 
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,

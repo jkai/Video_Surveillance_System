@@ -14,7 +14,22 @@
 
 #include "vc0706_if.h"
 
-void CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate)
+char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate)
 {
-    // TODO (Brandon): Implement
+    if(!VC0706SystemReset())
+    {
+        return 0;
+    }
+
+    if(!VC0706SetSerialNum(ucSerialNum))
+    {
+        return 0;
+    }
+
+    if(!VC0706SetBaudRate(usBaudRate))
+    {
+        return 0;
+    }
+
+    return 1;
 }

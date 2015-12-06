@@ -106,7 +106,9 @@ static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-extern void VC0706SetSerialNum(unsigned char usSerialNum);
+extern char VC0706SystemReset();
+extern char VC0706SetSerialNum(unsigned char ucSerialNum);
+extern char VC0706SetBaudRate(unsigned short usBaudRate);
 extern static char _VC0706RunCommand(unsigned char ucCmd,
                                      unsigned char *pucArgs,
                                      unsigned char ucArgn,

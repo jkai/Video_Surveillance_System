@@ -39,6 +39,14 @@ char VC0706SetBaudRate(unsigned short usBaudRate)
                              sizeof(ucArgs), 5);
 }
 
+char VC0706SetImageSize(unsigned char ucImageSize)
+{
+    unsgned char ucArgs[] = {0x05, 0x04, 0x01, 0x00, 0x19, ucImageSize}
+
+    return _VC0706RunCommand(VC0706_COMMAND_WRITE_DATA, ucArgs,
+                             sizeof(ucArgs), 5);
+}
+
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                               unsigned char ucArgn, unsigned char ucRespLen,
                               unsigned char ucFlushFlag)

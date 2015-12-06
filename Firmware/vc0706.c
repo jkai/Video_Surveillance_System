@@ -32,8 +32,8 @@ char VC0706SetSerialNum(unsigned char ucSerialNum)
 char VC0706SetBaudRate(unsigned short usBaudRate)
 {
     unsigned char ucArgs[] = {0x03, VC0706_INTERFACE_UART,
-                              (unsigned char)usBaudRate,
-                              (unsigned char)(usBaudRate >> 2)};
+                              (usBaudRate >> 8) & 0xFF,
+                              usBaudRate & 0xFF};
 
     return _VC0706RunCommand(VC0706_COMMAND_SET_PORT, ucArgs,
                              sizeof(ucArgs), 5);

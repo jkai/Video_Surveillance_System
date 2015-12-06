@@ -14,7 +14,7 @@
 
 #include "vc0706_if.h"
 
-void CameraInit(unsigned short usSerialNum)
+void CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate)
 {
     // TODO (Brandon): Implement
 }

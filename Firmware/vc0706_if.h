@@ -3,6 +3,9 @@
 // vc0706_if.h
 //
 // API for using the VC0706 Serial Camera Module.
+
+// A partial port of Adafruit-VC0706-Serial-Camera-Library found here:
+//  https://github.com/adafruit/Adafruit-VC0706-Serial-Camera-Library
 //
 // Created:
 // December 5, 2015
@@ -14,6 +17,8 @@
 
 #ifndef _VC0706_IF_H_
 #define _VC0706_IF_H_
+
+#include "vc0706.h"
 
 //*****************************************************************************
 // If building with a C++ compiler, make all of the definitions in this header
@@ -28,7 +33,7 @@ extern "C"
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-extern void CameraInit(unsigned short usSerialNum);
+extern void CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate);
 
 
 //*****************************************************************************

@@ -4,6 +4,9 @@
 //
 // Defines and Macros for the VC0706 Serial Camera Module.
 //
+// A partial port of Adafruit-VC0706-Serial-Camera-Library found here:
+//  https://github.com/adafruit/Adafruit-VC0706-Serial-Camera-Library
+//
 // Created:
 // December 4, 2015
 //
@@ -28,7 +31,6 @@ extern "C"
 //*****************************************************************************
 // Defines
 //*****************************************************************************
-
 #define VC0706_INTERFACE_UART                   0x01
 #define VC0706_INTERFACE_HS_UART                0x02
 #define VC0706_INTERFACE_SPI                    0x03
@@ -90,14 +92,32 @@ extern "C"
 #define VC0706_COMMAND_SET_BITMAP               0x71
 #define VC0706_COMMAND_BATCH_WRITE              0x80
 
+#define _VC0706_CAMERA_BUF_SIZE                 100
+#define _VC0706_CAMERA_DELAY                    10
+
+
+//*****************************************************************************
+// Variables
+//*****************************************************************************
+static unsigned char _ucSerialNum;
+static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
+
 
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-
-extern void VC0706SetSerialNum(unsigned short usSerialNum);
-extern void _VC0706SendCommand(unsigned short usSerialNum,
-                               unsigned char command);
+extern void VC0706SetSerialNum(unsigned char usSerialNum);
+extern static char _VC0706RunCommand(unsigned char ucCmd,
+                                     unsigned char *pucArgs,
+                                     unsigned char ucArgn,
+                                     unsigned char ucRespLen,
+                                     unsigned char ucFlushFlag)
+extern static void _VC0706SendCommand( unsigned char ucCmd,
+                                      unsigned char *pucArgs,
+                                      unsigned char ucArgn);
+extern static char _VC0706ReadResponse(unsigned char ucNumBytes,
+                                       unsigned char ucTimeout);
+extern static char _VC0706VerifyResponse(unsigned char ucCmd);
 
 
 //*****************************************************************************

@@ -21,7 +21,6 @@
 //*****************************************************************************
 // Includes
 //*****************************************************************************
-
 // Standard includes
 #include <stdlib.h>
 #include <string.h>
@@ -65,7 +64,6 @@
 //*****************************************************************************
 // Defines
 //*****************************************************************************
-
 #define TFTP_IP         0xC0A8010E      // This is the host IP: 192.168.1.14
 #define FILE_SIZE_MAX   (20*1024)       // Max File Size set to 20KB
 #define SSID            "NETGEAR31"
@@ -76,7 +74,6 @@
 //*****************************************************************************
 // Variables
 //*****************************************************************************
-
 // Vector table defined exterenally (in startup_css.c)
 extern void (* const g_pfnVectors[])(void);
 
@@ -84,7 +81,6 @@ extern void (* const g_pfnVectors[])(void);
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-
 static void BoardInit(void);
 static void TFTPTransfer(void);
 static void UARTIntHandler();   // UART interrupt handler
@@ -93,7 +89,6 @@ static void UARTIntHandler();   // UART interrupt handler
 //*****************************************************************************
 // Main
 //*****************************************************************************
-
 void main() 
 {
     long lRetVal = -1;
@@ -159,7 +154,6 @@ void main()
 //*****************************************************************************
 // Function Implementations
 //*****************************************************************************
-
 static void BoardInit(void)
 {
     // Set base of vector table

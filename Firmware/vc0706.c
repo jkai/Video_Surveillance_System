@@ -14,4 +14,13 @@
 
 #include "vc0706.h"
 
-// TODO (Brandon): Implement API for VC0706 driver
+void VC0706SetSerialNum(unsigned short usSerialNum)
+{
+    // TODO (Brandon): Implement
+}
+
+static void _VC0706SendCommand(unsigned short usSerialNum,
+                               unsigned char command)
+{
+    // TODO (Brandon): Implement
+}

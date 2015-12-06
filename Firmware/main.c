@@ -13,13 +13,13 @@
 // December 4, 2015
 //
 // Modified:
-// December 4, 2015
+// December 5, 2015
 //
 //*****************************************************************************
 
 
 //*****************************************************************************
-// INCLUDES
+// Includes
 //*****************************************************************************
 
 // Standard includes
@@ -63,18 +63,18 @@
 
 
 //*****************************************************************************
-// DEFINES
+// Defines
 //*****************************************************************************
 
-#define TFTP_IP			0xC0A8010E	// This is the host IP: 192.168.1.14
-#define FILE_SIZE_MAX	(20*1024)	// Max File Size set to 20KB
-#define SSID 			"NETGEAR31"
-#define SSID_KEY		"happystar329"
-#define OSI_STACK_SIZE	2048
+#define TFTP_IP         0xC0A8010E      // This is the host IP: 192.168.1.14
+#define FILE_SIZE_MAX   (20*1024)       // Max File Size set to 20KB
+#define SSID            "NETGEAR31"
+#define SSID_KEY        "happystar329"
+#define OSI_STACK_SIZE  2048
 
 
 //*****************************************************************************
-// VARIABLES
+// Variables
 //*****************************************************************************
 
 // Vector table defined exterenally (in startup_css.c)
@@ -82,16 +82,16 @@ extern void (* const g_pfnVectors[])(void);
 
 
 //*****************************************************************************
-// FUNCTION PROTOTYPES
+// Function Prototypes
 //*****************************************************************************
 
 static void BoardInit(void);
 static void TFTPTransfer(void);
-static void UARTIntHandler();	// UART interrupt handler
+static void UARTIntHandler();   // UART interrupt handler
 
 
 //*****************************************************************************
-// MAIN
+// Main
 //*****************************************************************************
 
 void main() 
@@ -157,7 +157,7 @@ void main()
 
 
 //*****************************************************************************
-// FUNCTION IMPLEMENTATIONS
+// Function Implementations
 //*****************************************************************************
 
 static void BoardInit(void)
@@ -175,13 +175,13 @@ static void BoardInit(void)
 static void TFTPTransfer(void)
 {
     SlSecParams_t secParams;
-    unsigned char *pucFileBuffer = NULL;  // Data read or to be written
+    unsigned char *pucFileBuffer = NULL;    // Data read or to be written
     unsigned long uiFileSize;
 
-    char *FileRead = "readFromServer.txt";	// File to be read using TFTP
-    char *FileWrite = "writeToServer.txt";	// File to be written using TFTP
+    char *FileRead = "readFromServer.txt";  // File to be read using TFTP
+    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
 
-    long pFileHandle;			// Pointer to file handle
+    long pFileHandle;   // Pointer to file handle
     SlFsFileInfo_t pFsFileInfo;
     long lRetVal = -1;
     unsigned short uiTftpErrCode;
@@ -193,8 +193,6 @@ static void TFTPTransfer(void)
 
     // Initialize network driver
     lRetVal = Network_IF_InitDriver(ROLE_STA);
-
-    UART_PRINT("HERE!\n\r");
 
     // Connecting to WLAN AP - Set with static parameters defined at the top
     // After this call we will be connected and have IP address
@@ -310,7 +308,7 @@ static void TFTPTransfer(void)
     }
 
     lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-    /* write to server with different file name */
+    // Write to server with different file name
     lRetVal = sl_TftpSend(TFTP_IP, FileWrite, (char *)pucFileBuffer,\
                         &uiFileSize, &uiTftpErrCode);
     if(lRetVal < 0)

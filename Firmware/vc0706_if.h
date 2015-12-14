@@ -11,14 +11,13 @@
 // December 5, 2015
 //
 // Modified:
-// December 5, 2015
+// December 13, 2015
 //
 //*****************************************************************************
 
 #ifndef _VC0706_IF_H_
 #define _VC0706_IF_H_
 
-#include "vc0706.h"
 
 //*****************************************************************************
 // If building with a C++ compiler, make all of the definitions in this header
@@ -33,9 +32,9 @@ extern "C"
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-extern char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
-                       unsigned char ucImageSize);
-extern char *CameraSnapshot();
+extern tBoolean CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
+                           unsigned char ucImageSize);
+extern unsigned char *CameraSnapshot();
 
 
 //*****************************************************************************

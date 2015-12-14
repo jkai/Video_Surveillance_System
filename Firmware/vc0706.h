@@ -11,7 +11,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 5, 2015
+// December 13, 2015
 //
 //*****************************************************************************
 
@@ -102,6 +102,9 @@ extern "C"
 #define VC0706_CURRENT_FRAME_CONTROL_STOP       0x00
 #define VC0706_CURRENT_FRAME_CONTROL_RESUME     0x02
 
+#define VC0706_CONTROL_MODE_MCU                 0x0C
+#define VC0706_CONTROL_MODE_DMA                 0x0F
+
 #define VC0706_IMAGE_SIZE_640_480               0x00
 #define VC0706_IMAGE_SIZE_320_240               0x11
 #define VC0706_IMAGE_SIZE_160_120               0x22
@@ -115,26 +118,29 @@ extern "C"
 //*****************************************************************************
 static unsigned char _ucSerialNum;
 static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
+static unsigned char _ucCameraBufLen;
+static unsigned short _usCameraBufIndex;
 
 
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
 extern void VC0706InitDriver(void);
-extern char VC0706SystemReset(void);
-extern char VC0706SetSerialNum(unsigned char ucSerialNum);
-extern char VC0706SetBaudRate(unsigned short usBaudRate);
-extern char VC0706SetImageSize(unsigned char ucImageSize);
-extern char VC0706SetFrameControl(unsigned char ucCtrlFlag);
+extern tBoolean VC0706SystemReset(void);
+extern tBoolean VC0706SetSerialNum(unsigned char ucSerialNum);
+extern tBoolean VC0706SetBaudRate(unsigned short usBaudRate);
+extern tBoolean VC0706SetImageSize(unsigned char ucImageSize);
+extern tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag);
 extern unsigned int VC0706GetFrameLength(void);
-static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
-                              unsigned char ucArgn, unsigned char ucRespLen,
-                              unsigned char ucFlushFlag);
+extern unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes);
+static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
+                                  unsigned char ucArgn, unsigned char ucRespLen,
+                                  tBoolean bFlush);
 static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                unsigned char ucArgn);
-static char _VC0706ReadResponse(unsigned char ucNumBytes,
-                                unsigned char ucTimeout);
-static char _VC0706VerifyResponse(unsigned char ucCmd);
+static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
+                                    unsigned char ucTimeout);
+static tBoolean _VC0706VerifyResponse(unsigned char ucCmd);
 
 
 //*****************************************************************************

@@ -23,60 +23,70 @@
 
 void VC0706InitDriver()
 {
+    _ucSerialNum = 0;
+    _usCameraBufIndex = 0;
+
     MAP_UARTConfigSetExpClk(VC0706, MAP_PRCMPeripheralClockGet(VC0706_PERIPH),
                             VC0706_DEFAULT_BAUD_RATE,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                             UART_CONFIG_PAR_NONE));
 }
 
-char VC0706SystemReset()
+tBoolean VC0706SystemReset()
 {
     unsigned char ucArgs[] = {0x0};
+    unsigned char ucRespLen = 5;
 
-    return _VC0706RunCommand(VC0706_COMMAND_SYSTEM_RESET, ucArgs, 1, 5, 0);
+    return _VC0706RunCommand(VC0706_COMMAND_SYSTEM_RESET, ucArgs,
+                             sizeof(ucArgs), ucRespLen, 0);
 }
 
-char VC0706SetSerialNum(unsigned char ucSerialNum)
+tBoolean VC0706SetSerialNum(unsigned char ucSerialNum)
 {
     unsigned char ucArgs[] = {0x01, ucSerialNum};
+    unsigned char ucRespLen = 5;
 
     return _VC0706RunCommand(VC0706_COMMAND_SET_SERIAL_NUM, ucArgs,
-                             sizeof(ucArgs), 5, 0);
+                             sizeof(ucArgs), ucRespLen, 0);
 }
 
-char VC0706SetBaudRate(unsigned short usBaudRate)
+tBoolean VC0706SetBaudRate(unsigned short usBaudRate)
 {
     unsigned char ucArgs[] = {0x03, VC0706_INTERFACE_UART,
                               (usBaudRate >> 8) & 0xFF,
                               usBaudRate & 0xFF};
+    unsigned char ucRespLen = 5;
 
     return _VC0706RunCommand(VC0706_COMMAND_SET_PORT, ucArgs,
-                             sizeof(ucArgs), 5, 0);
+                             sizeof(ucArgs), ucRespLen, 0);
 }
 
-char VC0706SetImageSize(unsigned char ucImageSize)
+tBoolean VC0706SetImageSize(unsigned char ucImageSize)
 {
     unsigned char ucArgs[] = {0x05, 0x04, 0x01, 0x00, 0x19, ucImageSize};
+    unsigned char ucRespLen = 5;
 
     return _VC0706RunCommand(VC0706_COMMAND_WRITE_DATA, ucArgs,
-                             sizeof(ucArgs), 5, 0);
+                             sizeof(ucArgs), ucRespLen, 0);
 }
 
-char VC0706SetFrameControl(unsigned char ucCtrlFlag)
+tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag)
 {
     unsigned char ucArgs[] = {0x01, ucCtrlFlag};
+    unsigned char ucRespLen = 5;
 
     return _VC0706RunCommand(VC0706_COMMAND_FBUF_CTRL, ucArgs,
-                             sizeof(ucArgs), 5, 0);
+                             sizeof(ucArgs), ucRespLen, 0);
 }
 
 unsigned int VC0706GetFrameLength(void)
 {
     unsigned int uiFrameLen;
     unsigned char ucArgs[] = {0x01, VC0706_CURRENT_FRAME};
+    unsigned char ucRespLen = 9;
 
     if(!_VC0706RunCommand(VC0706_COMMAND_GET_FBUF_LEN, ucArgs,
-                          sizeof(ucArgs), 9, 0))
+                          sizeof(ucArgs), ucRespLen, 0))
     {
         return 0;
     }
@@ -93,11 +103,38 @@ unsigned int VC0706GetFrameLength(void)
     return uiFrameLen;
 }
 
-static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
-                              unsigned char ucArgn, unsigned char ucRespLen,
-                              unsigned char ucFlushFlag)
+unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes)
 {
-    if(ucFlushFlag)
+    unsigned char ucArgs[] = {0x0C, VC0706_CURRENT_FRAME,
+                              VC0706_CONTROL_MODE_MCU,
+                              0x00, 0x00, (_usCameraBufIndex >> 8) & 0xFF,
+                              _usCameraBufIndex & 0xFF, 0x00, 0x00, 0x00,
+                              ucNumBytes, (_VC0706_CAMERA_DELAY >> 8) & 0xFF,
+                              _VC0706_CAMERA_DELAY & 0xFF};
+    unsigned char ucRespLen = 5;
+    _usFrameBufIndex = 0;
+
+    if(!_VC0706RunCommand(VC0706_COMMAND_READ_FBUF, ucArgs,
+                          sizeof(ucArgs), ucRespLen, 0))
+    {
+        return 0;
+    }
+
+    if(!_VC0706ReadResponse(ucNumBytes+ucRespLen, 200))
+    {
+        return 0;
+    }
+
+    _usFrameBufIndex += ucNumBytes;
+
+    return _ucCameraBuf;
+}
+
+static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
+                                  unsigned char ucArgn, unsigned char ucRespLen,
+                                  unsigned char bFlush)
+{
+    if(bFlush)
     {
         _VC0706ReadResponse(100, 10);
     }
@@ -132,15 +169,31 @@ static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
     }
 }
 
-static char _VC0706ReadResponse(unsigned char ucNumBytes,
-                                unsigned char ucTimeout)
+static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
+                                    unsigned char ucTimeout)
 {
-    // TODO (Brandon): Implement
+    //unsigned char ucCounter = 0;
+    _ucCameraBufLen = 0;
+    tBoolean bAvail;
 
-    return 0;
+    //while((ucTimeout != ucCounter) && (_ucCameraBufLen != ucNumBytes))
+    while(_ucCameraBufLen != ucNumBytes)
+    {
+        bAvail = MAP_UARTCharsAvail(VC0706);
+
+        if(!bAvail)
+        {
+            //ucCounter++;
+            continue;
+        }
+
+        _ucCameraBuf[_ucCameraBufLen++] = MAP_UARTCharGet(VC0706);
+    }
+
+    return _ucCameraBufLen;
 }
 
-static char _VC0706VerifyResponse(unsigned char ucCmd)
+static tBoolean _VC0706VerifyResponse(unsigned char ucCmd)
 {
     if((_ucCameraBuf[0] != VC0706_PROTOCOL_SIGN_RETURN) ||
        (_ucCameraBuf[1] != _ucSerialNum) ||

@@ -13,7 +13,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 5, 2015
+// December 13, 2015
 //
 //*****************************************************************************
 
@@ -209,7 +209,8 @@ static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize)
 
 static void MainTask(void)
 {
-    unsigned char pucBuf[] = "Testing TFTP Write!";
+    //unsigned char pucBuf[] = "Testing TFTP Write!";
+    unsigned char *pucBuf;
 
     // Network Driver Initialization
     NetInit();
@@ -227,7 +228,11 @@ static void MainTask(void)
         TFTPWrite(pucBuf, sizeof(pucBuf));
     }*/
 
+    pucBuf = CameraSnapshot();
+
     TFTPWrite(pucBuf, sizeof(pucBuf));
+
+    free(pucBuf);
 }
 
 // Interrupt handler for UART

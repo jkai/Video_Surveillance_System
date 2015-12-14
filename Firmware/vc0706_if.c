@@ -13,10 +13,16 @@
 //*****************************************************************************
 
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include "common.h"
+#include "hw_types.h"
+#include "uart_if.h"
+#include "vc0706.h"
 
 #include "vc0706_if.h"
 
-char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
+tBoolean CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
                 unsigned char ucImageSize)
 {
     VC0706InitDriver();
@@ -44,9 +50,13 @@ char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
     return 1;
 }
 
-char *CameraSnapshot()
+unsigned char *CameraSnapshot()
 {
     unsigned int uiFrameLen;
+    unsigned char *pucCameraBuf;
+    unsigned char *pucImageBuf;
+    unsigned char ucBytesToRead;
+    unsigned int uiImageBufOffset = 0;
 
     // Stop updating frame
     if(VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_STOP))
@@ -57,11 +67,32 @@ char *CameraSnapshot()
     // Get size of frame
     uiFrameLen = VC0706GetFrameLength();
 
+    // Allocate memory for snapshot
+    pucImageBuf = malloc(uiFrameLen);
+    if(pucImageBuf == NULL)
+    {
+        UART_PRINT("Can't Allocate Resources\r\n");
+        LOOP_FOREVER();
+    }
+
     // Get picture
+    while(uiFrameLen > 0)
+    {
+        ucBytesToRead = uiFrameLen>32 ? 32 : uiFrameLen;
+
+        pucCameraBuf = VC0706GetFrameBuffer(ucBytesToRead);
+
+        memcpy(pucImageBuf+uiImageBufOffset, pucCameraBuf, ucBytesToRead);
+
+        uiImageBufOffset+=ucBytesToRead;
+        uiFrameLen--;
+    }
 
     // Resume updating frame
     if(VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_RESUME))
     {
         return NULL;
     }
+
+    return pucImage;
 }

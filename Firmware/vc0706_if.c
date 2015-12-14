@@ -46,16 +46,21 @@ char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
 
 char *CameraSnapshot()
 {
+    unsigned int uiFrameLen;
+
     // Stop updating frame
-    if(VC0706SetFrameControl(VC0706_FRAME_CONTROL_STOP))
+    if(VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_STOP))
     {
         return NULL;
     }
 
-    // TODO (Brandon): Implement
+    // Get size of frame
+    uiFrameLen = VC0706GetFrameLength();
+
+    // Get picture
 
     // Resume updating frame
-    if(VC0706SetFrameControl(VC0706_FRAME_CONTROL_RESUME))
+    if(VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_RESUME))
     {
         return NULL;
     }

@@ -97,8 +97,10 @@ extern "C"
 #define VC0706_COMMAND_SET_BITMAP               0x71
 #define VC0706_COMMAND_BATCH_WRITE              0x80
 
-#define VC0706_FRAME_CONTROL_STOP               0x00
-#define VC0706_FRAME_CONTROL_RESUME             0x02
+#define VC0706_CURRENT_FRAME                    0x00
+
+#define VC0706_CURRENT_FRAME_CONTROL_STOP       0x00
+#define VC0706_CURRENT_FRAME_CONTROL_RESUME     0x02
 
 #define VC0706_IMAGE_SIZE_640_480               0x00
 #define VC0706_IMAGE_SIZE_320_240               0x11
@@ -118,12 +120,13 @@ static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-extern void VC0706InitDriver();
-extern char VC0706SystemReset();
+extern void VC0706InitDriver(void);
+extern char VC0706SystemReset(void);
 extern char VC0706SetSerialNum(unsigned char ucSerialNum);
 extern char VC0706SetBaudRate(unsigned short usBaudRate);
 extern char VC0706SetImageSize(unsigned char ucImageSize);
 extern char VC0706SetFrameControl(unsigned char ucCtrlFlag);
+extern unsigned int VC0706GetFrameLength(void);
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                               unsigned char ucArgn, unsigned char ucRespLen,
                               unsigned char ucFlushFlag);

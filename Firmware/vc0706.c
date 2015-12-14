@@ -70,6 +70,29 @@ char VC0706SetFrameControl(unsigned char ucCtrlFlag)
                              sizeof(ucArgs), 5, 0);
 }
 
+unsigned int VC0706GetFrameLength(void)
+{
+    unsigned int uiFrameLen;
+    unsigned char ucArgs[] = {0x01, VC0706_CURRENT_FRAME};
+
+    if(!_VC0706RunCommand(VC0706_COMMAND_GET_FBUF_LEN, ucArgs,
+                          sizeof(ucArgs), 9, 0))
+    {
+        return 0;
+    }
+
+    // Decode frame length
+    uiFrameLen = _ucCameraBuf[5];
+    uiFrameLen <<= 8;
+    uiFrameLen |= _ucCameraBuf[6];
+    uiFrameLen <<= 8;
+    uiFrameLen |= _ucCameraBuf[7];
+    uiFrameLen <<= 8;
+    uiFrameLen |= _ucCameraBuf[8];
+
+    return uiFrameLen;
+}
+
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                               unsigned char ucArgn, unsigned char ucRespLen,
                               unsigned char ucFlushFlag)

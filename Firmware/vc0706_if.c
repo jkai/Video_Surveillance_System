@@ -94,5 +94,5 @@ unsigned char *CameraSnapshot()
         return NULL;
     }
 
-    return pucImage;
+    return pucImageBuf;
 }

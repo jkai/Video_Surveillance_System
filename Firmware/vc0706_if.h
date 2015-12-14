@@ -30,6 +30,14 @@ extern "C"
 
 
 //*****************************************************************************
+// Defines
+//*****************************************************************************
+#define CAMERA_DEFAULT_SERIAL_NUM           0
+#define CAMERA_DEFAULT_BAUD_RATE            VC0706_INTERFACE_UART_BAUD_38400
+#define CAMERA_DEFAULT_IMAGE_SIZE           VC0706_IMAGE_SIZE_160_120
+
+
+//*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
 extern tBoolean CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,

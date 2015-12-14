@@ -17,7 +17,7 @@
 #include "prcm.h"
 #include "rom_map.h"
 #include "uart.h"
-
+#include "uart_if.h"
 
 #include "vc0706.h"
 
@@ -103,7 +103,7 @@ unsigned int VC0706GetFrameLength(void)
     return uiFrameLen;
 }
 
-unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes)
+unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes)
 {
     unsigned char ucArgs[] = {0x0C, VC0706_CURRENT_FRAME,
                               VC0706_CONTROL_MODE_MCU,
@@ -112,7 +112,7 @@ unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes)
                               ucNumBytes, (_VC0706_CAMERA_DELAY >> 8) & 0xFF,
                               _VC0706_CAMERA_DELAY & 0xFF};
     unsigned char ucRespLen = 5;
-    _usFrameBufIndex = 0;
+    _usCameraBufIndex = 0;
 
     if(!_VC0706RunCommand(VC0706_COMMAND_READ_FBUF, ucArgs,
                           sizeof(ucArgs), ucRespLen, 0))
@@ -125,14 +125,14 @@ unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes)
         return 0;
     }
 
-    _usFrameBufIndex += ucNumBytes;
+    _usCameraBufIndex += ucNumBytes;
 
     return _ucCameraBuf;
 }
 
 static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                   unsigned char ucArgn, unsigned char ucRespLen,
-                                  unsigned char bFlush)
+                                  tBoolean bFlush)
 {
     if(bFlush)
     {
@@ -177,6 +177,7 @@ static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
     tBoolean bAvail;
 
     //while((ucTimeout != ucCounter) && (_ucCameraBufLen != ucNumBytes))
+    Report("Before while loop in Read...\n\r");
     while(_ucCameraBufLen != ucNumBytes)
     {
         bAvail = MAP_UARTCharsAvail(VC0706);
@@ -187,6 +188,7 @@ static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
             continue;
         }
 
+        Report("Byte available!\n\r");
         _ucCameraBuf[_ucCameraBufLen++] = MAP_UARTCharGet(VC0706);
     }
 

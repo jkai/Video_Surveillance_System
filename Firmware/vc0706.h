@@ -132,7 +132,7 @@ extern tBoolean VC0706SetBaudRate(unsigned short usBaudRate);
 extern tBoolean VC0706SetImageSize(unsigned char ucImageSize);
 extern tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag);
 extern unsigned int VC0706GetFrameLength(void);
-extern unsigned char VC0706GetFrameBuffer(unsigned char ucNumBytes);
+extern unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes);
 static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                   unsigned char ucArgn, unsigned char ucRespLen,
                                   tBoolean bFlush);

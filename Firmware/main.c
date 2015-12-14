@@ -59,6 +59,8 @@
 
 // Application includes
 #include "pin_mux_config.h"
+#include "vc0706.h"
+#include "vc0706_if.h"
 
 
 //*****************************************************************************
@@ -121,6 +123,16 @@ void main()
 
     // Clear terminal
     ClearTerm();
+
+    Report("Made it here...?\n\r");
+
+    // Camera Initialzation
+    if(!CameraInit(CAMERA_DEFAULT_SERIAL_NUM, CAMERA_DEFAULT_BAUD_RATE,
+            CAMERA_DEFAULT_IMAGE_SIZE))
+    {
+        Report("Shit...\n\r");
+        LOOP_FOREVER();
+    }
 
     // Start the SimpleLink Host
     lRetVal = VStartSimpleLinkSpawnTask(SPAWN_TASK_PRIORITY);
@@ -190,7 +202,7 @@ static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize)
 {
     unsigned long ulFileSize;
 
-    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
+    char *FileWrite = "writeToServer.jpg";  // File to be written using TFTP
 
     long lRetVal = -1;
     unsigned short uiTftpErrCode;
@@ -228,10 +240,13 @@ static void MainTask(void)
         TFTPWrite(pucBuf, sizeof(pucBuf));
     }*/
 
+    UART_PRINT("Taking snapshot...\n\r");
     pucBuf = CameraSnapshot();
 
+    UART_PRINT("Sending snapshot over IP...\n\r");
     TFTPWrite(pucBuf, sizeof(pucBuf));
 
+    UART_PRINT("Freeing memory...\n\r");
     free(pucBuf);
 }
 

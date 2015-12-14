@@ -58,7 +58,7 @@
 #include "tftp.h"
 
 // Application includes
-#include "pinmux.h"
+#include "pin_mux_config.h"
 
 
 //*****************************************************************************

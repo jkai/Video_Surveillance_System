@@ -8,17 +8,22 @@
 // December 4, 2015
 //
 // Modified:
-// December 5, 2015
+// December 13, 2015
 //
 //*****************************************************************************
 
 #include "vc0706.h"
 
+void VC0706InitDriver()
+{
+
+}
+
 char VC0706SystemReset()
 {
     unsigned char ucArgs[] = {0x0};
 
-    return _VC0706RunCommand(VC0706_COMMAND_SYSTEM_RESET, ucArgs, 1, 5);
+    return _VC0706RunCommand(VC0706_COMMAND_SYSTEM_RESET, ucArgs, 1, 5, 0);
 }
 
 char VC0706SetSerialNum(unsigned char ucSerialNum)
@@ -26,7 +31,7 @@ char VC0706SetSerialNum(unsigned char ucSerialNum)
     unsigned char ucArgs[] = {0x01, ucSerialNum};
 
     return _VC0706RunCommand(VC0706_COMMAND_SET_SERIAL_NUM, ucArgs,
-                             sizeof(ucArgs), 5);
+                             sizeof(ucArgs), 5, 0);
 }
 
 char VC0706SetBaudRate(unsigned short usBaudRate)
@@ -36,15 +41,15 @@ char VC0706SetBaudRate(unsigned short usBaudRate)
                               usBaudRate & 0xFF};
 
     return _VC0706RunCommand(VC0706_COMMAND_SET_PORT, ucArgs,
-                             sizeof(ucArgs), 5);
+                             sizeof(ucArgs), 5, 0);
 }
 
 char VC0706SetImageSize(unsigned char ucImageSize)
 {
-    unsgned char ucArgs[] = {0x05, 0x04, 0x01, 0x00, 0x19, ucImageSize}
+    unsigned char ucArgs[] = {0x05, 0x04, 0x01, 0x00, 0x19, ucImageSize};
 
     return _VC0706RunCommand(VC0706_COMMAND_WRITE_DATA, ucArgs,
-                             sizeof(ucArgs), 5);
+                             sizeof(ucArgs), 5, 0);
 }
 
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
@@ -56,7 +61,7 @@ static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
         _VC0706ReadResponse(100, 10);
     }
 
-    _VC0706SendCommand(_ucSerialNum, ucCmd, pucArgs, ucArgn);
+    _VC0706SendCommand(ucCmd, pucArgs, ucArgn);
 
     if(_VC0706ReadResponse(ucRespLen, 200) != ucRespLen)
     {
@@ -74,21 +79,22 @@ static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
 static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                unsigned char ucArgn)
 {
-    // TODO (Brandon): Implement
+
 }
 
 static char _VC0706ReadResponse(unsigned char ucNumBytes,
                                 unsigned char ucTimeout)
 {
     // TODO (Brandon): Implement
+
+    return 0;
 }
 
-static char _VC0706VerifyResponse(unsigned char ucCmd,
-                                  unsigned char *pucCameraBuf)
+static char _VC0706VerifyResponse(unsigned char ucCmd)
 {
     if((_ucCameraBuf[0] != VC0706_PROTOCOL_SIGN_RETURN) ||
        (_ucCameraBuf[1] != _ucSerialNum) ||
-       (_ucCameraBuf[2] != _ucCmd) ||
+       (_ucCameraBuf[2] != ucCmd) ||
        (_ucCameraBuf[3] != VC0706_STATUS_SUCCESS))
     {
         return 0;

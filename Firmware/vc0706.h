@@ -110,21 +110,22 @@ static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
+extern void VC0706InitDriver();
 extern char VC0706SystemReset();
 extern char VC0706SetSerialNum(unsigned char ucSerialNum);
 extern char VC0706SetBaudRate(unsigned short usBaudRate);
 extern char VC0706SetImageSize(unsigned char ucImageSize);
-extern static char _VC0706RunCommand(unsigned char ucCmd,
+static char _VC0706RunCommand(unsigned char ucCmd,
                                      unsigned char *pucArgs,
                                      unsigned char ucArgn,
                                      unsigned char ucRespLen,
-                                     unsigned char ucFlushFlag)
-extern static void _VC0706SendCommand( unsigned char ucCmd,
+                                     unsigned char ucFlushFlag);
+static void _VC0706SendCommand(unsigned char ucCmd,
                                       unsigned char *pucArgs,
                                       unsigned char ucArgn);
-extern static char _VC0706ReadResponse(unsigned char ucNumBytes,
+static char _VC0706ReadResponse(unsigned char ucNumBytes,
                                        unsigned char ucTimeout);
-extern static char _VC0706VerifyResponse(unsigned char ucCmd);
+static char _VC0706VerifyResponse(unsigned char ucCmd);
 
 
 //*****************************************************************************

@@ -33,7 +33,8 @@ extern "C"
 //*****************************************************************************
 // Function Prototypes
 //*****************************************************************************
-extern void CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate);
+extern char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
+                       unsigned char ucImageSize);
 
 
 //*****************************************************************************

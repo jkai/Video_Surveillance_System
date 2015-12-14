@@ -8,7 +8,7 @@
 // December 5, 2015
 //
 // Modified:
-// December 5, 2015
+// December 13, 2015
 //
 //*****************************************************************************
 
@@ -17,6 +17,8 @@
 char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
                 unsigned char ucImageSize)
 {
+    VC0706InitDriver();
+
     if(!VC0706SystemReset())
     {
         return 0;

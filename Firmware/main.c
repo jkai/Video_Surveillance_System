@@ -83,8 +83,8 @@ extern void (* const g_pfnVectors[])(void);
 //*****************************************************************************
 static void BoardInit(void);
 static void NetInit(void);
+static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize);
 static void MainTask(void);
-static void TFTPTransfer(void);
 static void UARTIntHandler();   // UART interrupt handler
 
 
@@ -186,8 +186,31 @@ static void NetInit(void)
     lRetVal = Network_IF_ConnectAP(SSID, secParams);
 }
 
+static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize)
+{
+    unsigned long ulFileSize;
+
+    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
+
+    long lRetVal = -1;
+    unsigned short uiTftpErrCode;
+
+    // Send to server
+    lRetVal = sl_TftpSend(TFTP_IP, FileWrite, (char *)pucBuf,\
+                        &ulBufSize, &uiTftpErrCode);
+    if(lRetVal < 0)
+    {
+        ERR_PRINT(lRetVal);
+        LOOP_FOREVER();
+    }
+
+    UART_PRINT("Snapshot sent.\r\n");
+}
+
 static void MainTask(void)
 {
+    unsigned char pucBuf[] = "Testing TFTP Write!";
+
     // Network Driver Initialization
     NetInit();
 
@@ -201,139 +224,10 @@ static void MainTask(void)
         // Get snapshot from camera
 
         // Send snapshot to server
+        TFTPWrite(pucBuf, sizeof(pucBuf));
     }*/
 
-    unsigned char *pucFileBuffer = NULL;    // Data read or to be written
-    unsigned long uiFileSize;
-
-    char *FileRead = "readFromServer.txt";  // File to be read using TFTP
-    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
-
-    long pFileHandle;   // Pointer to file handle
-    SlFsFileInfo_t pFsFileInfo;
-    long lRetVal = -1;
-    unsigned short uiTftpErrCode;
-
-    //************************************************************
-    //  TFTP Read Start
-    //************************************************************
-
-    // Set limit on file size
-    uiFileSize = FILE_SIZE_MAX;
-
-    // Allocate heap space for file
-    pucFileBuffer = malloc(uiFileSize);
-    if(NULL == pucFileBuffer)
-    {
-        UART_PRINT("Can't Allocate Resources\r\n");
-        LOOP_FOREVER();
-    }
-
-    // Initialize heap space to 0 bytes
-    memset(pucFileBuffer, '\0', uiFileSize);
-
-    // Receive file using TFTP and store in pucFileBuffer
-    lRetVal = sl_TftpRecv(TFTP_IP, FileRead, (char *)pucFileBuffer,\
-                            &uiFileSize, &uiTftpErrCode );
-    if(lRetVal < 0)
-    {
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    // Populate pFsFileInfo with file information FileRead
-    lRetVal = sl_FsGetInfo((unsigned char *)FileRead, NULL, &pFsFileInfo);
-
-    if(lRetVal < 0 )
-    	// Creates file if sl_FsGetInfo fails (file does not exist)
-        lRetVal = sl_FsOpen((unsigned char *)FileRead,\
-                FS_MODE_OPEN_CREATE(FILE_SIZE_MAX, _FS_FILE_OPEN_FLAG_COMMIT|\
-                  _FS_FILE_PUBLIC_WRITE), NULL, &pFileHandle);
-    else
-    	// Opens file if sl_FsGetInfo succeeds (file exists)
-        lRetVal = sl_FsOpen((unsigned char *)FileRead, FS_MODE_OPEN_WRITE, \
-                            NULL, &pFileHandle);
-
-    if(lRetVal < 0)
-    {
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    // Write contents of file buffer to file
-    lRetVal = sl_FsWrite(pFileHandle, 0, pucFileBuffer, uiFileSize);
-    if(lRetVal < 0)
-    {
-        free(pucFileBuffer);
-        lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    UART_PRINT("TFTP Read Successful \r\n");
-
-    // Close file (successfully written to FS)
-    lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-
-    //************************************************************
-    //  TFTP Read End
-    //************************************************************
-
-
-    //************************************************************
-    //  TFTP Write Start
-    //************************************************************
-
-    // Open same file which has been written with the server's file content
-    lRetVal = sl_FsOpen((unsigned char *)FileRead, FS_MODE_OPEN_READ, \
-                            NULL,&pFileHandle);
-    if(lRetVal < 0)
-    {
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    // Populate pFsFileInfo with file information FileRead
-    lRetVal = sl_FsGetInfo((unsigned char *)FileRead, NULL, &pFsFileInfo);
-    if(lRetVal < 0)
-    {
-        lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    // Number of bytes to send is equal to the size of the file received
-    uiFileSize = (&pFsFileInfo)->FileLen;
-
-    lRetVal = sl_FsRead(pFileHandle, 0, pucFileBuffer, uiFileSize);
-    if(lRetVal < 0)
-    {
-        lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    lRetVal = sl_FsClose(pFileHandle, 0, 0, 0);
-    // Write to server with different file name
-    lRetVal = sl_TftpSend(TFTP_IP, FileWrite, (char *)pucFileBuffer,\
-                        &uiFileSize, &uiTftpErrCode);
-    if(lRetVal < 0)
-    {
-        free(pucFileBuffer);
-        ERR_PRINT(lRetVal);
-        LOOP_FOREVER();
-    }
-
-    UART_PRINT("TFTP Write Successful \r\n");
-
-    //************************************************************
-    //  TFTP Write End
-    //************************************************************
+    TFTPWrite(pucBuf, sizeof(pucBuf));
 }
 
 // Interrupt handler for UART

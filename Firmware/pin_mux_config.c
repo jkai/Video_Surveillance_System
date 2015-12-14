@@ -36,7 +36,7 @@
 //
 //*****************************************************************************
 
-// This file was automatically generated on 12/13/2015 at 7:54:03 PM
+// This file was automatically generated on 12/14/2015 at 10:40:19 AM
 // by TI PinMux version 
 //
 //*****************************************************************************
@@ -69,12 +69,12 @@ void PinMuxConfig(void)
     PinTypeUART(PIN_04, PIN_MODE_7);
 
     //
-    // Configure PIN_07 for UART1 UART1_TX
+    // Configure PIN_58 for UART1 UART1_TX
     //
-    PinTypeUART(PIN_07, PIN_MODE_5);
+    PinTypeUART(PIN_58, PIN_MODE_6);
 
     //
-    // Configure PIN_08 for UART1 UART1_RX
+    // Configure PIN_57 for UART1 UART1_RX
     //
-    PinTypeUART(PIN_08, PIN_MODE_5);
+    PinTypeUART(PIN_57, PIN_MODE_6);
 }

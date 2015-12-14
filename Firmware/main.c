@@ -82,6 +82,8 @@ extern void (* const g_pfnVectors[])(void);
 // Function Prototypes
 //*****************************************************************************
 static void BoardInit(void);
+static void NetInit(void);
+static void MainTask(void);
 static void TFTPTransfer(void);
 static void UARTIntHandler();   // UART interrupt handler
 
@@ -133,9 +135,9 @@ void main()
     Report("\t\t    Starting Video Streaming Application       \n\r");
     Report("\t\t *********************************************\n\r");
 
-    // Start TFTP transfer
-    lRetVal = osi_TaskCreate(TFTPTransfer,
-                    (const signed char *)"TFTP",
+    // Start main task
+    lRetVal = osi_TaskCreate(MainTask,
+                    (const signed char *)"MainTask",
                     OSI_STACK_SIZE,
                     NULL,
                     1,
@@ -166,19 +168,10 @@ static void BoardInit(void)
     PRCMCC3200MCUInit();
 }
 
-static void TFTPTransfer(void)
+static void NetInit(void)
 {
     SlSecParams_t secParams;
-    unsigned char *pucFileBuffer = NULL;    // Data read or to be written
-    unsigned long uiFileSize;
-
-    char *FileRead = "readFromServer.txt";  // File to be read using TFTP
-    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
-
-    long pFileHandle;   // Pointer to file handle
-    SlFsFileInfo_t pFsFileInfo;
     long lRetVal = -1;
-    unsigned short uiTftpErrCode;
 
     // Configuring security parameters for the AP
     secParams.Key = SSID_KEY;
@@ -191,11 +184,35 @@ static void TFTPTransfer(void)
     // Connecting to WLAN AP - Set with static parameters defined at the top
     // After this call we will be connected and have IP address
     lRetVal = Network_IF_ConnectAP(SSID, secParams);
+}
+
+static void MainTask(void)
+{
+    // Network Driver Initialization
+    NetInit();
 
     // Output IP to terminal
-    UART_PRINT("Connecting to TFTP server %d.%d.%d.%d\n\r",\
+    UART_PRINT("Packet destination: %d.%d.%d.%d\n\r",\
                   SL_IPV4_BYTE(TFTP_IP, 3), SL_IPV4_BYTE(TFTP_IP, 2),
                   SL_IPV4_BYTE(TFTP_IP, 1), SL_IPV4_BYTE(TFTP_IP, 0));
+
+    /*while (1)
+    {
+        // Get snapshot from camera
+
+        // Send snapshot to server
+    }*/
+
+    unsigned char *pucFileBuffer = NULL;    // Data read or to be written
+    unsigned long uiFileSize;
+
+    char *FileRead = "readFromServer.txt";  // File to be read using TFTP
+    char *FileWrite = "writeToServer.txt";  // File to be written using TFTP
+
+    long pFileHandle;   // Pointer to file handle
+    SlFsFileInfo_t pFsFileInfo;
+    long lRetVal = -1;
+    unsigned short uiTftpErrCode;
 
     //************************************************************
     //  TFTP Read Start

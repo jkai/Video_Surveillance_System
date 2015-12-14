@@ -18,6 +18,7 @@
 #ifndef _VC0706_H_
 #define _VC0706_H_
 
+
 //*****************************************************************************
 // If building with a C++ compiler, make all of the definitions in this header
 // have a C binding.
@@ -31,6 +32,10 @@ extern "C"
 //*****************************************************************************
 // Defines
 //*****************************************************************************
+#define VC0706                                  UARTA1_BASE
+#define VC0706_PERIPH                           PRCM_UARTA1
+#define VC0706_DEFAULT_BAUD_RATE                38400
+
 #define VC0706_INTERFACE_UART                   0x01
 #define VC0706_INTERFACE_HS_UART                0x02
 #define VC0706_INTERFACE_SPI                    0x03
@@ -92,6 +97,9 @@ extern "C"
 #define VC0706_COMMAND_SET_BITMAP               0x71
 #define VC0706_COMMAND_BATCH_WRITE              0x80
 
+#define VC0706_FRAME_CONTROL_STOP               0x00
+#define VC0706_FRAME_CONTROL_RESUME             0x02
+
 #define VC0706_IMAGE_SIZE_640_480               0x00
 #define VC0706_IMAGE_SIZE_320_240               0x11
 #define VC0706_IMAGE_SIZE_160_120               0x22
@@ -115,16 +123,14 @@ extern char VC0706SystemReset();
 extern char VC0706SetSerialNum(unsigned char ucSerialNum);
 extern char VC0706SetBaudRate(unsigned short usBaudRate);
 extern char VC0706SetImageSize(unsigned char ucImageSize);
-static char _VC0706RunCommand(unsigned char ucCmd,
-                                     unsigned char *pucArgs,
-                                     unsigned char ucArgn,
-                                     unsigned char ucRespLen,
-                                     unsigned char ucFlushFlag);
-static void _VC0706SendCommand(unsigned char ucCmd,
-                                      unsigned char *pucArgs,
-                                      unsigned char ucArgn);
+extern char VC0706SetFrameControl(unsigned char ucCtrlFlag);
+static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
+                              unsigned char ucArgn, unsigned char ucRespLen,
+                              unsigned char ucFlushFlag);
+static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
+                               unsigned char ucArgn);
 static char _VC0706ReadResponse(unsigned char ucNumBytes,
-                                       unsigned char ucTimeout);
+                                unsigned char ucTimeout);
 static char _VC0706VerifyResponse(unsigned char ucCmd);
 
 

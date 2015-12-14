@@ -35,6 +35,7 @@ extern "C"
 //*****************************************************************************
 extern char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
                        unsigned char ucImageSize);
+extern char *CameraSnapshot();
 
 
 //*****************************************************************************

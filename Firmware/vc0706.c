@@ -12,11 +12,21 @@
 //
 //*****************************************************************************
 
+#include "hw_memmap.h"
+#include "hw_types.h"
+#include "prcm.h"
+#include "rom_map.h"
+#include "uart.h"
+
+
 #include "vc0706.h"
 
 void VC0706InitDriver()
 {
-
+    MAP_UARTConfigSetExpClk(VC0706, MAP_PRCMPeripheralClockGet(VC0706_PERIPH),
+                            VC0706_DEFAULT_BAUD_RATE,
+                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
+                            UART_CONFIG_PAR_NONE));
 }
 
 char VC0706SystemReset()
@@ -52,6 +62,14 @@ char VC0706SetImageSize(unsigned char ucImageSize)
                              sizeof(ucArgs), 5, 0);
 }
 
+char VC0706SetFrameControl(unsigned char ucCtrlFlag)
+{
+    unsigned char ucArgs[] = {0x01, ucCtrlFlag};
+
+    return _VC0706RunCommand(VC0706_COMMAND_FBUF_CTRL, ucArgs,
+                             sizeof(ucArgs), 5, 0);
+}
+
 static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                               unsigned char ucArgn, unsigned char ucRespLen,
                               unsigned char ucFlushFlag)
@@ -79,7 +97,16 @@ static char _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
 static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                unsigned char ucArgn)
 {
+    int i;
 
+    MAP_UARTCharPut(VC0706, VC0706_PROTOCOL_SIGN_RECEIVE);
+    MAP_UARTCharPut(VC0706, _ucSerialNum);
+    MAP_UARTCharPut(VC0706, ucCmd);
+
+    for(i=0; i<ucArgn; i++)
+    {
+        MAP_UARTCharPut(VC0706, ucCmd);
+    }
 }
 
 static char _VC0706ReadResponse(unsigned char ucNumBytes,

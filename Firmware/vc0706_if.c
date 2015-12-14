@@ -12,6 +12,8 @@
 //
 //*****************************************************************************
 
+#include <stddef.h>
+
 #include "vc0706_if.h"
 
 char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
@@ -40,4 +42,21 @@ char CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
     }
 
     return 1;
+}
+
+char *CameraSnapshot()
+{
+    // Stop updating frame
+    if(VC0706SetFrameControl(VC0706_FRAME_CONTROL_STOP))
+    {
+        return NULL;
+    }
+
+    // TODO (Brandon): Implement
+
+    // Resume updating frame
+    if(VC0706SetFrameControl(VC0706_FRAME_CONTROL_RESUME))
+    {
+        return NULL;
+    }
 }

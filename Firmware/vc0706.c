@@ -8,7 +8,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 13, 2015
+// December 14, 2015
 //
 //*****************************************************************************
 
@@ -17,7 +17,9 @@
 #include "prcm.h"
 #include "rom_map.h"
 #include "uart.h"
+#include "utils.h"
 #include "uart_if.h"
+#include "gpio_if.h"
 
 #include "vc0706.h"
 
@@ -30,6 +32,8 @@ void VC0706InitDriver()
                             VC0706_DEFAULT_BAUD_RATE,
                             (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
                             UART_CONFIG_PAR_NONE));
+
+    MAP_UARTEnable(VC0706);
 }
 
 tBoolean VC0706SystemReset()
@@ -146,6 +150,7 @@ static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
         return 0;
     }
 
+    GPIO_IF_LedOn(MCU_RED_LED_GPIO);
     if(!_VC0706VerifyResponse(ucCmd))
     {
         return 0;
@@ -165,7 +170,7 @@ static void _VC0706SendCommand(unsigned char ucCmd, unsigned char *pucArgs,
 
     for(i=0; i<ucArgn; i++)
     {
-        MAP_UARTCharPut(VC0706, ucCmd);
+        MAP_UARTCharPut(VC0706, pucArgs[i]);
     }
 }
 
@@ -174,24 +179,28 @@ static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
 {
     //unsigned char ucCounter = 0;
     _ucCameraBufLen = 0;
-    tBoolean bAvail;
+    //tBoolean bAvail;
 
-    //while((ucTimeout != ucCounter) && (_ucCameraBufLen != ucNumBytes))
-    Report("Before while loop in Read...\n\r");
+    //while((ucCounter != ucTimeout) && (_ucCameraBufLen != ucNumBytes))
     while(_ucCameraBufLen != ucNumBytes)
     {
-        bAvail = MAP_UARTCharsAvail(VC0706);
+        /*bAvail = MAP_UARTCharsAvail(VC0706);
 
         if(!bAvail)
         {
-            //ucCounter++;
+            ucCounter++;
+            MAP_UtilsDelay(100);
             continue;
         }
+        ucCounter = 0;*/
 
-        Report("Byte available!\n\r");
+        //Report("Byte available!\n\r");
+        Report("Before UARTCharGet...\n\r");
         _ucCameraBuf[_ucCameraBufLen++] = MAP_UARTCharGet(VC0706);
+        Report("After UARTCharGet... char %c\n\r", _ucCameraBuf[_ucCameraBufLen-1]);
     }
 
+    Report("Before return...\n\r");
     return _ucCameraBufLen;
 }
 

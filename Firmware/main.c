@@ -13,7 +13,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 13, 2015
+// December 14, 2015
 //
 //*****************************************************************************
 
@@ -33,6 +33,7 @@
 #include "hw_uart.h"
 
 // Driverlib includes
+#include "gpio.h"
 #include "interrupt.h"
 #include "prcm.h"
 #include "rom.h"
@@ -48,6 +49,7 @@
 #include "osi.h"
 
 // Common includes
+#include "gpio_if.h"
 #include "network_if.h"
 #include "uart_if.h"
 #include "udma_if.h"
@@ -87,7 +89,6 @@ static void BoardInit(void);
 static void NetInit(void);
 static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize);
 static void MainTask(void);
-static void UARTIntHandler();   // UART interrupt handler
 
 
 //*****************************************************************************
@@ -103,34 +104,26 @@ void main()
     // Enable and configure DMA
     UDMAInit();
 
-    // Pinmux for UART
+    // Pinmux for UART and GPIO
     PinMuxConfig();
 
-    // Configuring UART
-    InitTerm();
-
-    // Register interrupt handler for UARTA0
-    MAP_UARTIntRegister(UARTA0_BASE, UARTIntHandler);
-
-    // Enable DMA done interrupts for UARTA0
-    //MAP_UARTIntEnable(UARTA0_BASE, UART_INT_DMARX);
+    // LED Initialization
+    GPIO_IF_LedConfigure(LED1|LED2|LED3);
+    GPIO_IF_LedOff(MCU_ALL_LED_IND);
 
     // Configure UART to work with the Terminal
-    MAP_UARTConfigSetExpClk(CONSOLE, MAP_PRCMPeripheralClockGet(CONSOLE_PERIPH),
-                            UART_BAUD_RATE,
-                            (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |
-                            UART_CONFIG_PAR_NONE));
+    InitTerm();
 
     // Clear terminal
     ClearTerm();
 
-    Report("Made it here...?\n\r");
+    // Enable DMA done interrupts for UARTA0
+    //MAP_UARTIntEnable(UARTA0_BASE, UART_INT_DMARX);
 
     // Camera Initialzation
     if(!CameraInit(CAMERA_DEFAULT_SERIAL_NUM, CAMERA_DEFAULT_BAUD_RATE,
             CAMERA_DEFAULT_IMAGE_SIZE))
     {
-        Report("Shit...\n\r");
         LOOP_FOREVER();
     }
 
@@ -250,12 +243,6 @@ static void MainTask(void)
     free(pucBuf);
 }
 
-// Interrupt handler for UART
-static void UARTIntHandler()
-{
-    // TODO (Brandon): Handle UART interrupts
-    return;
-}
 
 //*****************************************************************************
 //

@@ -32,8 +32,10 @@ extern "C"
 //*****************************************************************************
 // Defines
 //*****************************************************************************
-#define VC0706                                  UARTA1_BASE
-#define VC0706_PERIPH                           PRCM_UARTA1
+//#define VC0706                                  UARTA1_BASE
+//#define VC0706_PERIPH                           PRCM_UARTA1
+#define VC0706                                  UARTA0_BASE
+#define VC0706_PERIPH                           PRCM_UARTA0
 #define VC0706_DEFAULT_BAUD_RATE                38400
 
 #define VC0706_INTERFACE_UART                   0x01
@@ -102,7 +104,8 @@ extern "C"
 #define VC0706_CURRENT_FRAME_CONTROL_STOP       0x00
 #define VC0706_CURRENT_FRAME_CONTROL_RESUME     0x02
 
-#define VC0706_CONTROL_MODE_MCU                 0x0C
+//#define VC0706_CONTROL_MODE_MCU                 0x0C
+#define VC0706_CONTROL_MODE_MCU                 0x0A
 #define VC0706_CONTROL_MODE_DMA                 0x0F
 
 #define VC0706_IMAGE_SIZE_640_480               0x00

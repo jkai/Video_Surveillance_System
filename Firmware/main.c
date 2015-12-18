@@ -101,9 +101,6 @@ void main()
     // Board Initialization
     BoardInit();
 
-    // Enable and configure DMA
-    UDMAInit();
-
     // Pinmux for UART and GPIO
     PinMuxConfig();
 
@@ -112,13 +109,10 @@ void main()
     GPIO_IF_LedOff(MCU_ALL_LED_IND);
 
     // Configure UART to work with the Terminal
-    InitTerm();
+    //InitTerm();
 
     // Clear terminal
-    ClearTerm();
-
-    // Enable DMA done interrupts for UARTA0
-    //MAP_UARTIntEnable(UARTA0_BASE, UART_INT_DMARX);
+    //ClearTerm();
 
     // Camera Initialzation
     if(!CameraInit(CAMERA_DEFAULT_SERIAL_NUM, CAMERA_DEFAULT_BAUD_RATE,
@@ -136,9 +130,9 @@ void main()
     }
 
     // Display banner
-    Report("\t\t *********************************************\n\r");
-    Report("\t\t    Starting Video Streaming Application       \n\r");
-    Report("\t\t *********************************************\n\r");
+    //Report("\t\t *********************************************\n\r");
+    //Report("\t\t    Starting Video Streaming Application       \n\r");
+    //Report("\t\t *********************************************\n\r");
 
     // Start main task
     lRetVal = osi_TaskCreate(MainTask,
@@ -209,7 +203,7 @@ static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize)
         LOOP_FOREVER();
     }
 
-    UART_PRINT("Snapshot sent.\r\n");
+    //UART_PRINT("Snapshot sent.\r\n");
 }
 
 static void MainTask(void)
@@ -218,29 +212,42 @@ static void MainTask(void)
     unsigned char *pucBuf;
 
     // Network Driver Initialization
-    NetInit();
+    //NetInit();
 
     // Output IP to terminal
-    UART_PRINT("Packet destination: %d.%d.%d.%d\n\r",\
+    /*UART_PRINT("Packet destination: %d.%d.%d.%d\n\r",\
                   SL_IPV4_BYTE(TFTP_IP, 3), SL_IPV4_BYTE(TFTP_IP, 2),
-                  SL_IPV4_BYTE(TFTP_IP, 1), SL_IPV4_BYTE(TFTP_IP, 0));
+                  SL_IPV4_BYTE(TFTP_IP, 1), SL_IPV4_BYTE(TFTP_IP, 0));*/
 
     /*while (1)
     {
         // Get snapshot from camera
+        pucBuf = CameraSnapshot();
+        if(pucBuf == NULL)
+        {
+            LOOP_FOREVER();
+        }
 
         // Send snapshot to server
-        TFTPWrite(pucBuf, sizeof(pucBuf));
+        //TFTPWrite(pucBuf, sizeof(pucBuf));
+
+        free(pucBuf);
     }*/
 
-    UART_PRINT("Taking snapshot...\n\r");
+    //UART_PRINT("Taking snapshot...\n\r");
     pucBuf = CameraSnapshot();
+    if(pucBuf == NULL)
+    {
+        LOOP_FOREVER();
+    }
 
-    UART_PRINT("Sending snapshot over IP...\n\r");
+    //UART_PRINT("Sending snapshot over IP...\n\r");
     TFTPWrite(pucBuf, sizeof(pucBuf));
 
-    UART_PRINT("Freeing memory...\n\r");
+    //UART_PRINT("Freeing memory...\n\r");
     free(pucBuf);
+
+    LOOP_FOREVER();
 }
 
 

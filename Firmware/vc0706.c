@@ -150,7 +150,6 @@ static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
         return 0;
     }
 
-    GPIO_IF_LedOn(MCU_RED_LED_GPIO);
     if(!_VC0706VerifyResponse(ucCmd))
     {
         return 0;
@@ -194,13 +193,9 @@ static tBoolean _VC0706ReadResponse(unsigned char ucNumBytes,
         }
         ucCounter = 0;*/
 
-        //Report("Byte available!\n\r");
-        Report("Before UARTCharGet...\n\r");
         _ucCameraBuf[_ucCameraBufLen++] = MAP_UARTCharGet(VC0706);
-        Report("After UARTCharGet... char %c\n\r", _ucCameraBuf[_ucCameraBufLen-1]);
     }
 
-    Report("Before return...\n\r");
     return _ucCameraBufLen;
 }
 
@@ -211,6 +206,7 @@ static tBoolean _VC0706VerifyResponse(unsigned char ucCmd)
        (_ucCameraBuf[2] != ucCmd) ||
        (_ucCameraBuf[3] != VC0706_STATUS_SUCCESS))
     {
+        GPIO_IF_LedOn(MCU_RED_LED_GPIO);
         return 0;
     }
 

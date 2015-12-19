@@ -13,7 +13,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 14, 2015
+// December 18, 2015
 //
 //*****************************************************************************
 
@@ -210,9 +210,10 @@ static void MainTask(void)
 {
     //unsigned char pucBuf[] = "Testing TFTP Write!";
     unsigned char *pucBuf;
+    unsigned int uiBufLen;
 
     // Network Driver Initialization
-    //NetInit();
+    NetInit();
 
     // Output IP to terminal
     /*UART_PRINT("Packet destination: %d.%d.%d.%d\n\r",\
@@ -235,14 +236,14 @@ static void MainTask(void)
     }*/
 
     //UART_PRINT("Taking snapshot...\n\r");
-    pucBuf = CameraSnapshot();
+    pucBuf = CameraSnapshot(&uiBufLen);
     if(pucBuf == NULL)
     {
         LOOP_FOREVER();
     }
 
     //UART_PRINT("Sending snapshot over IP...\n\r");
-    TFTPWrite(pucBuf, sizeof(pucBuf));
+    TFTPWrite(pucBuf, uiBufLen);
 
     //UART_PRINT("Freeing memory...\n\r");
     free(pucBuf);

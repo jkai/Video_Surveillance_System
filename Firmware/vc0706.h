@@ -11,7 +11,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 14, 2015
+// December 18, 2015
 //
 //*****************************************************************************
 
@@ -104,7 +104,6 @@ extern "C"
 #define VC0706_CURRENT_FRAME_CONTROL_STOP       0x00
 #define VC0706_CURRENT_FRAME_CONTROL_RESUME     0x02
 
-//#define VC0706_CONTROL_MODE_MCU                 0x0C
 #define VC0706_CONTROL_MODE_MCU                 0x0A
 #define VC0706_CONTROL_MODE_DMA                 0x0F
 

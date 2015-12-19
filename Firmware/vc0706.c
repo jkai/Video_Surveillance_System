@@ -8,7 +8,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 14, 2015
+// December 18, 2015
 //
 //*****************************************************************************
 
@@ -124,6 +124,7 @@ unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes)
         return 0;
     }
 
+    // ucRespLen offset is to account for the end command bytes
     if(!_VC0706ReadResponse(ucNumBytes+ucRespLen, 200))
     {
         return 0;

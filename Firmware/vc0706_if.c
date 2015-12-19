@@ -8,7 +8,7 @@
 // December 5, 2015
 //
 // Modified:
-// December 14, 2015
+// December 18, 2015
 //
 //*****************************************************************************
 
@@ -30,7 +30,7 @@ tBoolean CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
 {
     VC0706InitDriver();
 
-    // System reset not working... fix this later...
+    // System reset not working... fix this later..
     /*if(!VC0706SystemReset())
     {
         GPIO_IF_LedOn(MCU_RED_LED_GPIO);
@@ -60,9 +60,9 @@ tBoolean CameraInit(unsigned char ucSerialNum, unsigned short usBaudRate,
     return 1;
 }
 
-unsigned char *CameraSnapshot()
+unsigned char *CameraSnapshot(unsigned int *uiFrameLen)
 {
-    unsigned int uiFrameLen;
+    unsigned int uiBytesLeft;
     unsigned char *pucCameraBuf;
     unsigned char *pucImageBuf;
     unsigned char ucBytesToRead;
@@ -71,14 +71,16 @@ unsigned char *CameraSnapshot()
     // Stop updating frame
     if(!VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_STOP))
     {
+        *uiFrameLen = 0;
         return NULL;
     }
 
     // Get size of frame
-    uiFrameLen = VC0706GetFrameLength();
+    *uiFrameLen = VC0706GetFrameLength();
+    uiBytesLeft = *uiFrameLen;
 
     // Allocate memory for snapshot
-    pucImageBuf = malloc(uiFrameLen);
+    pucImageBuf = malloc(*uiFrameLen);
     if(pucImageBuf == NULL)
     {
         //UART_PRINT("Can't Allocate Resources\r\n");
@@ -86,22 +88,23 @@ unsigned char *CameraSnapshot()
     }
 
     // Get picture
-    while(uiFrameLen > 0)
+    while(uiBytesLeft > 0)
     {
-        ucBytesToRead = uiFrameLen>64 ? 64 : uiFrameLen;
+        ucBytesToRead = uiBytesLeft>64 ? 64 : uiBytesLeft;
 
         pucCameraBuf = VC0706GetFrameBuffer(ucBytesToRead);
 
         memcpy(pucImageBuf+uiImageBufOffset, pucCameraBuf, ucBytesToRead);
 
         uiImageBufOffset+=ucBytesToRead;
-        uiFrameLen-=ucBytesToRead;
+        uiBytesLeft-=ucBytesToRead;
     }
 
     // Resume updating frame
     if(!VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_RESUME))
     {
         free(pucImageBuf);
+        *uiFrameLen = 0;
         return NULL;
     }
 

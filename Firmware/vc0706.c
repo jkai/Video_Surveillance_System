@@ -8,7 +8,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 18, 2015
+// December 19, 2015
 //
 //*****************************************************************************
 
@@ -81,6 +81,8 @@ tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag)
 
     return _VC0706RunCommand(VC0706_COMMAND_FBUF_CTRL, ucArgs,
                              sizeof(ucArgs), ucRespLen, 0);
+
+    _usCameraBufIndex = 0;
 }
 
 unsigned int VC0706GetFrameLength(void)
@@ -116,7 +118,6 @@ unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes)
                               ucNumBytes, (_VC0706_CAMERA_DELAY >> 8) & 0xFF,
                               _VC0706_CAMERA_DELAY & 0xFF};
     unsigned char ucRespLen = 5;
-    _usCameraBufIndex = 0;
 
     if(!_VC0706RunCommand(VC0706_COMMAND_READ_FBUF, ucArgs,
                           sizeof(ucArgs), ucRespLen, 0))

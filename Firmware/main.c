@@ -13,7 +13,7 @@
 // December 4, 2015
 //
 // Modified:
-// December 18, 2015
+// December 19, 2015
 //
 //*****************************************************************************
 
@@ -107,12 +107,6 @@ void main()
     // LED Initialization
     GPIO_IF_LedConfigure(LED1|LED2|LED3);
     GPIO_IF_LedOff(MCU_ALL_LED_IND);
-
-    // Configure UART to work with the Terminal
-    //InitTerm();
-
-    // Clear terminal
-    //ClearTerm();
 
     // Camera Initialzation
     if(!CameraInit(CAMERA_DEFAULT_SERIAL_NUM, CAMERA_DEFAULT_BAUD_RATE,
@@ -208,8 +202,7 @@ static void TFTPWrite(unsigned char *pucBuf, unsigned long ulBufSize)
 
 static void MainTask(void)
 {
-    //unsigned char pucBuf[] = "Testing TFTP Write!";
-    unsigned char *pucBuf;
+    unsigned char *pucBuf = NULL;
     unsigned int uiBufLen;
 
     // Network Driver Initialization
@@ -220,33 +213,21 @@ static void MainTask(void)
                   SL_IPV4_BYTE(TFTP_IP, 3), SL_IPV4_BYTE(TFTP_IP, 2),
                   SL_IPV4_BYTE(TFTP_IP, 1), SL_IPV4_BYTE(TFTP_IP, 0));*/
 
-    /*while (1)
+    while (1)
     {
         // Get snapshot from camera
-        pucBuf = CameraSnapshot();
+        pucBuf = CameraSnapshot(&uiBufLen);
         if(pucBuf == NULL)
         {
             LOOP_FOREVER();
         }
 
         // Send snapshot to server
-        //TFTPWrite(pucBuf, sizeof(pucBuf));
+        TFTPWrite(pucBuf, uiBufLen);
 
+        // Freeing memory
         free(pucBuf);
-    }*/
-
-    //UART_PRINT("Taking snapshot...\n\r");
-    pucBuf = CameraSnapshot(&uiBufLen);
-    if(pucBuf == NULL)
-    {
-        LOOP_FOREVER();
     }
-
-    //UART_PRINT("Sending snapshot over IP...\n\r");
-    TFTPWrite(pucBuf, uiBufLen);
-
-    //UART_PRINT("Freeing memory...\n\r");
-    free(pucBuf);
 
     LOOP_FOREVER();
 }

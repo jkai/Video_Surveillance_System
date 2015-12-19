@@ -8,7 +8,7 @@
 // December 5, 2015
 //
 // Modified:
-// December 18, 2015
+// December 19, 2015
 //
 //*****************************************************************************
 
@@ -80,7 +80,7 @@ unsigned char *CameraSnapshot(unsigned int *uiFrameLen)
     uiBytesLeft = *uiFrameLen;
 
     // Allocate memory for snapshot
-    pucImageBuf = malloc(*uiFrameLen);
+    pucImageBuf = malloc(uiBytesLeft);
     if(pucImageBuf == NULL)
     {
         //UART_PRINT("Can't Allocate Resources\r\n");

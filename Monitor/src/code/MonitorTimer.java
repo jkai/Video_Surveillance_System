@@ -11,7 +11,8 @@ public class MonitorTimer extends Thread {
 		while (true) {
 			try {
 				//Tick every 1s
-				Thread.sleep(1000);
+				//Thread.sleep(1000);
+				Thread.sleep(2000);
 				tick();
 			} catch (InterruptedException e) {
 				e.printStackTrace();

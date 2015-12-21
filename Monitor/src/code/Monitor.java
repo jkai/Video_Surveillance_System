@@ -16,10 +16,10 @@ public class Monitor extends JFrame {
 	private JPanel monitorPanel = new JPanel();
 	private JButton btnStartServer = new JButton("Start Server");
 	private JButton btnStartTimer = new JButton("Start Timer");
-
+	
 	public Monitor() {
 		super("Video Surveillance System");
-		setSize(240, 240);
+		setSize(260, 220);
 		this.getContentPane().setBackground(Color.WHITE);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new FlowLayout());
@@ -30,7 +30,9 @@ public class Monitor extends JFrame {
 	}
 
 	public void initial() {
+		monitorPanel.setBounds(50, 20, 160, 120);
 		monitorPanel.setBackground(Color.WHITE);	
+		monitorPanel.add(new ImageLoader("resources/Ready.jpg"));
 		
 		// Start button
 		btnStartServer.addActionListener(new ActionListener() {

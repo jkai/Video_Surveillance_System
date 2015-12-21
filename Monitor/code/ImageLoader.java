@@ -31,7 +31,7 @@ public class ImageLoader extends Component {
 	}
 
 	public Dimension getPreferredSize() {
-		return new Dimension(640, 480);
+		return new Dimension(160, 120);
 	}
 
 }

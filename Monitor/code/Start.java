@@ -8,14 +8,14 @@ public class Start {
 
 	public static LinkedList<BufferedImage> ImgList = new LinkedList<BufferedImage>();
 	public static Monitor monitor;
-	public static TcpServer server;
+	public static TFTPServer server;
 	public static MonitorTimer timer;
 
 	public static void main(String[] args) {
 
-		// TCP server initial
+		// TFTP server initial
 		try {
-			server = new TcpServer(6066);
+			server = new TFTPServer();
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -34,7 +34,7 @@ public class Start {
 		return Start.ImgList;
 	}
 
-	public static TcpServer getServer() {
+	public static TFTPServer getServer() {
 		return Start.server;
 	}
 

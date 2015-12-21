@@ -121,7 +121,6 @@ extern "C"
 static unsigned char _ucSerialNum;
 static unsigned char _ucCameraBuf[_VC0706_CAMERA_BUF_SIZE+1];
 static unsigned char _ucCameraBufLen;
-static unsigned short _usCameraBufIndex;
 
 
 //*****************************************************************************
@@ -134,7 +133,8 @@ extern tBoolean VC0706SetBaudRate(unsigned short usBaudRate);
 extern tBoolean VC0706SetImageSize(unsigned char ucImageSize);
 extern tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag);
 extern unsigned int VC0706GetFrameLength(void);
-extern unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes);
+extern unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes,
+                                           unsigned short usOffset);
 static tBoolean _VC0706RunCommand(unsigned char ucCmd, unsigned char *pucArgs,
                                   unsigned char ucArgn, unsigned char ucRespLen,
                                   tBoolean bFlush);

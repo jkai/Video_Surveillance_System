@@ -67,6 +67,7 @@ unsigned char *CameraSnapshot(unsigned int *uiFrameLen)
     unsigned char *pucImageBuf;
     unsigned char ucBytesToRead;
     unsigned int uiImageBufOffset = 0;
+    unsigned short usCameraBufOffset = 0;
 
     // Stop updating frame
     if(!VC0706SetFrameControl(VC0706_CURRENT_FRAME_CONTROL_STOP))
@@ -92,7 +93,8 @@ unsigned char *CameraSnapshot(unsigned int *uiFrameLen)
     {
         ucBytesToRead = uiBytesLeft>64 ? 64 : uiBytesLeft;
 
-        pucCameraBuf = VC0706GetFrameBuffer(ucBytesToRead);
+        pucCameraBuf = VC0706GetFrameBuffer(ucBytesToRead, usCameraBufOffset);
+        usCameraBufOffset += ucBytesToRead;
 
         memcpy(pucImageBuf+uiImageBufOffset, pucCameraBuf, ucBytesToRead);
 

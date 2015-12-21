@@ -26,7 +26,6 @@
 void VC0706InitDriver()
 {
     _ucSerialNum = 0;
-    _usCameraBufIndex = 0;
 
     MAP_UARTConfigSetExpClk(VC0706, MAP_PRCMPeripheralClockGet(VC0706_PERIPH),
                             VC0706_DEFAULT_BAUD_RATE,
@@ -81,8 +80,6 @@ tBoolean VC0706SetFrameControl(unsigned char ucCtrlFlag)
 
     return _VC0706RunCommand(VC0706_COMMAND_FBUF_CTRL, ucArgs,
                              sizeof(ucArgs), ucRespLen, 0);
-
-    _usCameraBufIndex = 0;
 }
 
 unsigned int VC0706GetFrameLength(void)
@@ -109,12 +106,13 @@ unsigned int VC0706GetFrameLength(void)
     return uiFrameLen;
 }
 
-unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes)
+unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes,
+                                    unsigned short usOffset)
 {
     unsigned char ucArgs[] = {0x0C, VC0706_CURRENT_FRAME,
                               VC0706_CONTROL_MODE_MCU,
-                              0x00, 0x00, (_usCameraBufIndex >> 8) & 0xFF,
-                              _usCameraBufIndex & 0xFF, 0x00, 0x00, 0x00,
+                              0x00, 0x00, (usOffset >> 8) & 0xFF,
+                              usOffset & 0xFF, 0x00, 0x00, 0x00,
                               ucNumBytes, (_VC0706_CAMERA_DELAY >> 8) & 0xFF,
                               _VC0706_CAMERA_DELAY & 0xFF};
     unsigned char ucRespLen = 5;
@@ -130,8 +128,6 @@ unsigned char *VC0706GetFrameBuffer(unsigned char ucNumBytes)
     {
         return 0;
     }
-
-    _usCameraBufIndex += ucNumBytes;
 
     return _ucCameraBuf;
 }
